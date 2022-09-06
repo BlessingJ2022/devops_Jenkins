@@ -45,29 +45,33 @@ sudo yum install -y openssl
 # gnupg2 curl:
 sudo yum install -y curl
 
-# Jenkins on CentOS requires Java, but it won't work with the default (GCJ) version of Java. So, let's remove it:
-sudo yum remove -y java
-
-# install the OpenJDK version of Java 8:
-sudo yum install -y java-1.8.0-openjdk-devel
-
 # Jenkins uses 'ant' so let's make sure it is installed:
 sudo yum install -y ant
 
 # Let's now install Jenkins:
 echo "=====> [3]: installing Jenkins ...."
-sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
-sudo yum install -y jenkins
 
 echo "=====> [4]: updating server after jenkins installation ...."
 sudo yum update -y
 
-echo "=====> [5]: Start Jenkins Daemon and Enable ...."
+# Jenkins on CentOS requires Java, but it won't work with the default (GCJ) version of Java. So, let's remove it:
+
+sudo yum remove -y java
+
+echo "=====> [5]: Install Java ...."
+sudo yum install java-11-openjdk -y
+
+echo "=====> [6]: Install Jenkins ...."
+sudo yum install jenkins -y
+
+echo "=====> [7]: Start Jenkins Daemon and Enable ...."
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
 
-echo "=====> [6]: Ajust Firewall ...."
+echo "=====> [8]: Ajust Firewall ...."
 sudo firewall-cmd --permanent --zone=public --add-port=8080/tcp
 sudo firewall-cmd --reload
 
